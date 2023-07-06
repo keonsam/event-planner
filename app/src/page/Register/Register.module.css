@@ -1,0 +1,17 @@
+.container {
+  padding: 75px 16px 50px 16px;
+}
+
+.buttonContainer {
+  margin-top: 75px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+@media only screen and (min-width: 750px) {
+  .container {
+    max-width: 750px;
+    margin: 0 auto;
+  }
+}

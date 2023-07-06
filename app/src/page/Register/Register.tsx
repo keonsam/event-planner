@@ -2,6 +2,9 @@ import { FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axiosClient from "../../config/axiosClient";
 import { User } from "../../types/User";
+import TextField from "../../components/TextField/TextField";
+import Button from "../../components/Button/Button";
+import styles from "./Register.module.css";
 
 type FieldName = "firstName" | "lastName" | "username" | "password";
 
@@ -32,11 +35,10 @@ const Register = () => {
     event.preventDefault();
 
     try {
-      const { data: user } = await axiosClient.post<User>(
+      await axiosClient.post<User>(
         "/register",
         register
       );
-      console.log(user);
       navigate("/login");
     } catch (error) {
       console.log(error);
@@ -44,44 +46,44 @@ const Register = () => {
   };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="first_name">First Name</label>
-          <input
-            id="first_name"
-            onChange={({ target }) => handleChange("firstName", target.value)}
-          />
-
-          <label htmlFor="last_name">Last Name</label>
-          <input
-            id="last_name"
-            onChange={({ target }) => handleChange("lastName", target.value)}
-          />
-        </div>
-
-        <label htmlFor="username">Username</label>
-        <input
-          id="username"
-          onChange={({ target }) => handleChange("username", target.value)}
+    <form className={styles.container} onSubmit={handleSubmit}>
+        <TextField
+          label="First Name"
+          id="firstName"
+          value={register.firstName}
+          onChange={(value) => handleChange("firstName", value)}
         />
 
-        <label htmlFor="password">Password</label>
-        <input
-          id="password"
-          type="password"
-          onChange={({ target }) => handleChange("password", target.value)}
+        <TextField
+          label="Last Name"
+          id="lastName"
+          value={register.lastName}
+          onChange={(value) => handleChange("lastName", value)}
         />
 
-        <div>
-          <button type="submit">Sign Up</button>
-        </div>
+      <TextField
+        label="Username"
+        id="username"
+        value={register.username}
+        onChange={(value) => handleChange("username", value)}
+      />
 
-        <p>
-          Already have an account? <Link to="/register"> Login now</Link>
-        </p>
-      </form>
-    </div>
+      <TextField
+        label="Password"
+        id="password"
+        value={register.password}
+        type="password"
+        onChange={(value) => handleChange("password", value)}
+      />
+
+      <div className={styles.buttonContainer}>
+        <Button label="Sign up" type="submit" primary />
+        <Button
+          label="Already have an Account"
+          onClick={() => navigate("/login")}
+        />
+      </div>
+    </form>
   );
 };
 

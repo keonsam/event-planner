@@ -102,7 +102,7 @@ router.put(
   }
 );
 
-router.put(
+router.delete(
   "/events/:id",
   authenticate,
   async (req: Request, res: Response, next: NextFunction) => {

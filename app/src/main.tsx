@@ -1,11 +1,15 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Navigate,
+  RouterProvider,
+} from "react-router-dom";
 import App from "./App.tsx";
 import "./index.css";
 import Login from "./page/Login/Login.tsx";
 import Register from "./page/Register/Register.tsx";
-import Dashboard from "./page/Dashboard/Dashboard.tsx";
+import EventList from "./page/EventList/EventList.tsx";
 
 const router = createBrowserRouter([
   {
@@ -22,8 +26,8 @@ const router = createBrowserRouter([
         element: <Register />,
       },
       {
-        path: "dashboard",
-        element: <Dashboard />,
+        path: "events",
+        element: <EventList />,
       },
     ],
   },

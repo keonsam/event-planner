@@ -3,6 +3,7 @@ export type Event = {
   name: string;
   dateOfEvent: string;
   description: string;
+  location: string;
   createdBy: string;
   createdAt: string;
   updatedAt: string;

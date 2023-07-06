@@ -45,6 +45,7 @@ export default class EventRepository {
       .insert({
         name: eventData.name,
         description: eventData.description,
+        location: eventData.location,
         created_by: eventData.createdBy,
       })
       .returning("*");
@@ -87,6 +88,7 @@ export default class EventRepository {
       name: dbEvent.name,
       dateOfEvent: dbEvent.date_of_event,
       description: dbEvent.description,
+      location: dbEvent.location,
       createdBy: dbEvent.created_by,
       createdAt: dbEvent.created_at,
       updatedAt: dbEvent.updated_at,

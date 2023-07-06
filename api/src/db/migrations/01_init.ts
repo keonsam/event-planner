@@ -74,6 +74,7 @@ export async function up(knex: Knex): Promise<void> {
       .primary();
     table.string("name").notNullable();
     table.string("description").notNullable();
+    table.string("location").notNullable();
     table
       .timestamp("date_of_event", { useTz: true })
       .notNullable()

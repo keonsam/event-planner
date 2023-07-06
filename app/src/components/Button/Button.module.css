@@ -1,0 +1,28 @@
+.button {
+  border-radius: 10px;
+  height: 50px;
+  width: 100%;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  color: #274d76;
+  background: #fff;
+  border: 1px solid #274d76;
+  text-align: center;
+}
+
+.primary {
+  background: #274d76;
+  color: #fff;
+}
+
+.medium {
+  flex: 1;
+}
+
+.small {
+  width: 100px;
+  height: 34px;
+  border-color: #fff;
+}

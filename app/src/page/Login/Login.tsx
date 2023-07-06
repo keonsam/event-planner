@@ -1,7 +1,10 @@
 import { FormEvent, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axiosClient from "../../config/axiosClient";
 import { saveToken } from "../../utils/jwt";
+import styles from "./Login.module.css";
+import TextField from "../../components/TextField/TextField";
+import Button from "../../components/Button/Button";
 
 type FieldName = "username" | "password";
 
@@ -33,39 +36,38 @@ const Login = () => {
         "/login",
         login
       );
-      saveToken(data.token)
-      navigate("/dashboard");
+      saveToken(data.token);
+      navigate("/events");
     } catch (error) {
       console.log(error);
     }
   };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="username">Username</label>
-        <input
-          id="username"
-          onChange={({ target }) => handleChange("username", target.value)}
-          value={login.username}
-        />
+    <form className={styles.container} onSubmit={handleSubmit}>
+      <TextField
+        label="Username"
+        id="username"
+        value={login.username}
+        onChange={(value) => handleChange("username", value)}
+      />
 
-        <label htmlFor="password">Password</label>
-        <input
-          id="password"
-          type="password"
-          onChange={({ target }) => handleChange("password", target.value)}
-          value={login.password}
-        />
+      <TextField
+        label="Password"
+        id="password"
+        value={login.password}
+        onChange={(value) => handleChange("password", value)}
+        type="password"
+      />
 
-        <div>
-          <button type="submit">Login</button>
-        </div>
-        <p>
-          don't have an account? <Link to="/register">Sign up now</Link>
-        </p>
-      </form>
-    </div>
+      <div className={styles.buttonContainer}>
+        <Button label="Sign in" type="submit" primary />
+        <Button
+          label="Create new Account"
+          onClick={() => navigate("/register")}
+        />
+      </div>
+    </form>
   );
 };
 
