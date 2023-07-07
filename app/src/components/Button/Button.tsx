@@ -1,6 +1,7 @@
 import styles from "./Button.module.css";
 
 type Props = {
+  disabled?: boolean;
   label: string;
   primary?: boolean;
   size?: "medium" | "small";
@@ -9,6 +10,7 @@ type Props = {
 };
 
 export const Button = ({
+  disabled = false,
   label,
   size,
   primary,
@@ -19,9 +21,10 @@ export const Button = ({
     <button
       className={`${styles.button} ${primary ? styles.primary : ""} ${
         size ? styles[size] : ""
-      }`}
+      } ${disabled && primary ? styles.disabled: ""}`}
       type={type}
       onClick={onClick}
+      disabled={disabled}
     >
       {label}
     </button>

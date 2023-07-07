@@ -5,6 +5,7 @@ import axiosClient from "../../config/axiosClient";
 import { Event } from "../../types/Event";
 import TextField from "../TextField/TextField";
 import Button from "../Button/Button";
+import { createEventSchema } from "../../types/schema";
 
 type EventData = {
   name: string;
@@ -22,7 +23,7 @@ const EventForm = ({ id, onClose }: Props) => {
   const [eventData, setEventData] = useState<EventData>({
     name: "",
     description: "",
-    dateOfEvent: "",
+    dateOfEvent: new Date().toISOString(),
     location: "",
   });
 
@@ -70,6 +71,9 @@ const EventForm = ({ id, onClose }: Props) => {
     }
   }, [id, eventData.name]);
 
+  // TODO: Change to onBlur
+  const { error } = createEventSchema.validate(eventData);
+
   return (
     <Modal>
       <form className={styles.eventForm} onSubmit={handleSubmit}>
@@ -84,9 +88,11 @@ const EventForm = ({ id, onClose }: Props) => {
         <TextField
           label="Event Date"
           id="eventDate"
-          value={eventData.dateOfEvent}
-          onChange={(value) => handleChange("eventDate", value)}
-          type="date"
+          value={eventData.dateOfEvent.slice(0, 16)}
+          onChange={(value) =>
+            handleChange("dateOfEvent", new Date(value).toISOString())
+          }
+          type="datetime-local"
         />
 
         <TextField
@@ -116,6 +122,7 @@ const EventForm = ({ id, onClose }: Props) => {
             size="medium"
             primary
             type="submit"
+            disabled={!!error}
           />
         </div>
       </form>

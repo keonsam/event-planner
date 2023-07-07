@@ -78,7 +78,6 @@ export async function up(knex: Knex): Promise<void> {
     table
       .timestamp("date_of_event", { useTz: true })
       .notNullable()
-      .defaultTo(knex.raw("(now() at time zone 'utc')"));
     table
       .uuid("created_by")
       .notNullable()

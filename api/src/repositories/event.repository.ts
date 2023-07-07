@@ -17,7 +17,8 @@ export default class EventRepository {
       .offset((pageNumber - 1) * pageSize)
       .orderBy("date_of_event", sort);
 
-    logger.info({ id: events[0].id }, "Events retrieved");
+    
+    logger.info({ id: events[0]?.id }, "Events retrieved");
 
     return events.map(this.mapDbEvent);
   }
@@ -44,6 +45,7 @@ export default class EventRepository {
     const [event] = await db<EventTable>(EVENT_TABLE_NAME)
       .insert({
         name: eventData.name,
+        date_of_event: eventData.dateOfEvent,
         description: eventData.description,
         location: eventData.location,
         created_by: eventData.createdBy,

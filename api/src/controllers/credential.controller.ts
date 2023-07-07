@@ -1,7 +1,8 @@
 import { Router, Request, Response, NextFunction } from "express";
-import logger from "../middleware/logger";
 import { Login, Register } from "../types/credential";
 import CredentialService from "../services/credential.service";
+import { validate } from "../middleware/validation";
+import { loginSchema, registerSchema } from "../types/schema";
 
 const router = Router();
 
@@ -9,6 +10,7 @@ const credentialService = new CredentialService();
 
 router.post(
   "/register",
+  validate(registerSchema, "body"),
   async (req: Request, res: Response, next: NextFunction) => {
     req.log.info("Register request received");
 
@@ -24,6 +26,7 @@ router.post(
 
 router.post(
   "/login",
+  validate(loginSchema, "body"),
   async (req: Request, res: Response, next: NextFunction) => {
     req.log.info("Login request received");
 

@@ -1,9 +1,10 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { authenticate } from "../middleware/authentication";
-import logger from "../middleware/logger";
 import EventService from "../services/event.service";
 import { Pagination, Sort } from "../types/pagination";
 import { EventData } from "../types/event";
+import { validate } from "../middleware/validation";
+import { createEventSchema, getEventsSchema, idSchema } from "../types/schema";
 
 const router = Router();
 
@@ -11,18 +12,17 @@ const eventService = new EventService();
 
 router.get(
   "/events",
+  validate(getEventsSchema, "query"),
   authenticate,
   async (req: Request, res: Response, next: NextFunction) => {
     req.log.info("Get Events request received");
     try {
       const { user, query } = req;
 
-      logger.info({ user, query }, "Get Events request data");
-
       const pagination: Pagination = {
-        pageNumber: Number(query.pageNumber) || 1,
-        pageSize: Number(query.pageSize) || 10,
-        sort: (query.sort as Sort) || "asc",
+        pageNumber: Number(query.pageNumber),
+        pageSize: Number(query.pageSize),
+        sort: query.sort as Sort,
       };
 
       const events = await eventService.getEvents(
@@ -38,6 +38,7 @@ router.get(
 
 router.get(
   "/events/:id",
+  validate(idSchema, "params"),
   authenticate,
   async (req: Request, res: Response, next: NextFunction) => {
     req.log.info("Get Event request received");
@@ -49,14 +50,14 @@ router.get(
 
       res.status(200).json(event);
     } catch (error) {
-      logger.error(error);
-      res.status(500).json("Something went wrong!");
+      next(error)
     }
   }
 );
 
 router.post(
   "/events",
+  validate(createEventSchema, "body"),
   authenticate,
   async (req: Request, res: Response, next: NextFunction) => {
     req.log.info("Add Event request received");
@@ -64,15 +65,12 @@ router.post(
     try {
       const { user, body } = req;
 
-      logger.info({ user, body }, "Create Event request data");
-
       const eventData: EventData = {
         ...body,
         createdBy: user.credentialId,
       };
 
       const event = await eventService.addEvent(eventData);
-      logger.info(event, "Event created");
       res.status(201).json(event);
     } catch (error) {
       next(error);
@@ -82,6 +80,7 @@ router.post(
 
 router.put(
   "/events/:id",
+  validate(idSchema, "params"),
   authenticate,
   async (req: Request, res: Response, next: NextFunction) => {
     req.log.info("Update Event request received");
@@ -104,6 +103,7 @@ router.put(
 
 router.delete(
   "/events/:id",
+  validate(idSchema, "params"),
   authenticate,
   async (req: Request, res: Response, next: NextFunction) => {
     req.log.info("Delete Event request received");

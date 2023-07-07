@@ -32,7 +32,6 @@ const EventList = () => {
       const { data: events } = await axiosClient.get<Event[]>(
         `/events?pageNumber=${pageNumber}&pageSize=${pageSize}&sort=${sort}`
       );
-      console.log({ events });
       setEvents(events);
     } catch (error) {
       console.log(error);
@@ -55,10 +54,9 @@ const EventList = () => {
   };
 
   useEffect(() => {
-    if (!events.length) {
-      getEvents();
-    }
-  }, [events, getEvents]);
+    getEvents();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Layout>

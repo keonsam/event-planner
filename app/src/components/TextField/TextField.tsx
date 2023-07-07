@@ -6,10 +6,10 @@ type Props = {
   required?: boolean;
   id: string;
   phaceholder?: string;
-  value: string;
+  value: string | Date;
   onBlur?: () => void;
   onChange: (value: string) => void;
-  type?: "text" | "number" | "date" | "password";
+  type?: "text" | "number" | "date" | "password" | "datetime-local";
 };
 
 const TextField = ({

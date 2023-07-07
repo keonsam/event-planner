@@ -5,6 +5,7 @@ import { User } from "../../types/User";
 import TextField from "../../components/TextField/TextField";
 import Button from "../../components/Button/Button";
 import styles from "./Register.module.css";
+import { registerSchema } from "../../types/schema";
 
 type FieldName = "firstName" | "lastName" | "username" | "password";
 
@@ -35,31 +36,31 @@ const Register = () => {
     event.preventDefault();
 
     try {
-      await axiosClient.post<User>(
-        "/register",
-        register
-      );
+      await axiosClient.post<User>("/register", register);
       navigate("/login");
     } catch (error) {
       console.log(error);
     }
   };
 
+  // TODO: Change to onBlur
+  const { error } = registerSchema.validate(register);
+
   return (
     <form className={styles.container} onSubmit={handleSubmit}>
-        <TextField
-          label="First Name"
-          id="firstName"
-          value={register.firstName}
-          onChange={(value) => handleChange("firstName", value)}
-        />
+      <TextField
+        label="First Name"
+        id="firstName"
+        value={register.firstName}
+        onChange={(value) => handleChange("firstName", value)}
+      />
 
-        <TextField
-          label="Last Name"
-          id="lastName"
-          value={register.lastName}
-          onChange={(value) => handleChange("lastName", value)}
-        />
+      <TextField
+        label="Last Name"
+        id="lastName"
+        value={register.lastName}
+        onChange={(value) => handleChange("lastName", value)}
+      />
 
       <TextField
         label="Username"
@@ -77,7 +78,7 @@ const Register = () => {
       />
 
       <div className={styles.buttonContainer}>
-        <Button label="Sign up" type="submit" primary />
+        <Button label="Sign up" type="submit" primary disabled={!!error} />
         <Button
           label="Already have an Account"
           onClick={() => navigate("/login")}

@@ -5,6 +5,7 @@ import { saveToken } from "../../utils/jwt";
 import styles from "./Login.module.css";
 import TextField from "../../components/TextField/TextField";
 import Button from "../../components/Button/Button";
+import { loginSchema } from "../../types/schema";
 
 type FieldName = "username" | "password";
 
@@ -43,6 +44,9 @@ const Login = () => {
     }
   };
 
+  // TODO: Change to onBlur
+  const { error } = loginSchema.validate(login);
+
   return (
     <form className={styles.container} onSubmit={handleSubmit}>
       <TextField
@@ -61,7 +65,7 @@ const Login = () => {
       />
 
       <div className={styles.buttonContainer}>
-        <Button label="Sign in" type="submit" primary />
+        <Button label="Sign in" type="submit" primary disabled={!!error} />
         <Button
           label="Create new Account"
           onClick={() => navigate("/register")}
