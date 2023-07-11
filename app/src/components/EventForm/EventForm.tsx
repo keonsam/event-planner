@@ -5,7 +5,11 @@ import axiosClient from "../../config/axiosClient";
 import { Event } from "../../types/Event";
 import TextField from "../TextField/TextField";
 import Button from "../Button/Button";
-import { createEventSchema } from "../../types/schema";
+import { eventFormSchema } from "../../types/schema";
+import TextArea from "../TextArea/TextArea";
+import { AxiosError } from "axios";
+
+type FieldName = "name" | "description" | "dateOfEvent" | "location";
 
 type EventData = {
   name: string;
@@ -13,6 +17,10 @@ type EventData = {
   dateOfEvent: string;
   location: string;
 };
+
+type EventError = Partial<
+  EventData & { formError: string; [key: string]: string }
+>;
 
 type Props = {
   id: string;
@@ -22,15 +30,27 @@ type Props = {
 const EventForm = ({ id, onClose }: Props) => {
   const [eventData, setEventData] = useState<EventData>({
     name: "",
-    description: "",
     dateOfEvent: new Date().toISOString(),
+    description: "",
     location: "",
   });
 
-  const handleChange = (fieldName: string, value: string) => {
+  const [error, setError] = useState<EventError>({});
+
+  // event handles
+  const handleChange = (fieldName: FieldName, value: string) => {
+    const message =
+      eventFormSchema[fieldName].validate(eventData[fieldName]).error
+        ?.details[0].message || "";
+
     setEventData({
       ...eventData,
       [fieldName]: value,
+    });
+
+    setError({
+      ...error,
+      [fieldName]: message,
     });
   };
 
@@ -45,7 +65,12 @@ const EventForm = ({ id, onClose }: Props) => {
       }
       onClose(true);
     } catch (err) {
-      console.log(err);
+      if (err instanceof AxiosError) {
+        setError({
+          ...error,
+          formError: err.message,
+        });
+      }
     }
   };
 
@@ -61,28 +86,41 @@ const EventForm = ({ id, onClose }: Props) => {
           description: event.description,
           location: event.location,
         });
-      } catch (error) {
-        console.log(error);
+      } catch (err) {
+        if (err instanceof AxiosError) {
+          setError({
+            ...error,
+            formError: err.message,
+          });
+        }
       }
     };
 
     if (id && !eventData.name) {
       getEvent();
     }
-  }, [id, eventData.name]);
+  }, [id, eventData.name, error]);
 
-  // TODO: Change to onBlur
-  const { error } = createEventSchema.validate(eventData);
+  const isValid =
+    !!eventData.name &&
+    !!eventData.dateOfEvent &&
+    !!eventData.description &&
+    !!eventData.location &&
+    !error.name &&
+    !error.dateOfEvent &&
+    !error.description &&
+    !error.location;
 
   return (
     <Modal>
-      <form className={styles.eventForm} onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <h2 className={styles.title}>{id ? "Edit" : "Create"} Event</h2>
         <TextField
           label="Name"
           id="eventName"
           value={eventData.name}
           onChange={(value) => handleChange("name", value)}
+          error={error.name}
         />
 
         <TextField
@@ -92,6 +130,7 @@ const EventForm = ({ id, onClose }: Props) => {
           onChange={(value) =>
             handleChange("dateOfEvent", new Date(value).toISOString())
           }
+          error={error.dateOfEvent}
           type="datetime-local"
         />
 
@@ -100,20 +139,19 @@ const EventForm = ({ id, onClose }: Props) => {
           id="location"
           value={eventData.location}
           onChange={(value) => handleChange("location", value)}
+          error={error.location}
         />
 
-        {/* TODO: Move to component TextArea */}
-        <div className={styles.textarea}>
-          <label className={styles.label} htmlFor="description">
-            Description
-          </label>
-          <textarea
-            id="description"
-            className={styles.input}
-            onChange={({ target }) => handleChange("description", target.value)}
-            value={eventData.description}
-          />
-        </div>
+        <TextArea
+          label="Description"
+          id="description"
+          onChange={(value) => handleChange("description", value)}
+          value={eventData.description}
+          required
+          error={error.description}
+        />
+
+        <p className={styles.formError}>{error.formError && error.formError}</p>
 
         <div className={styles.buttonContainer}>
           <Button label="Cancel" size="medium" onClick={() => onClose()} />
@@ -122,7 +160,7 @@ const EventForm = ({ id, onClose }: Props) => {
             size="medium"
             primary
             type="submit"
-            disabled={!!error}
+            disabled={!isValid}
           />
         </div>
       </form>

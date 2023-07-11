@@ -1,4 +1,4 @@
-import styles from "./TextField.module.css";
+import styles from "./TextArea.module.css";
 
 type Props = {
   label: string;
@@ -9,37 +9,34 @@ type Props = {
   value?: string;
   onBlur?: () => void;
   onChange: (value: string) => void;
-  type?: "text" | "number" | "date" | "password" | "datetime-local";
   error?: string;
 };
 
-const TextField = ({
+const TextArea = ({
   label,
   id,
   value,
   required,
   onChange,
   onBlur,
-  type = "text",
   error,
 }: Props) => {
   return (
-    <div className={styles.textField}>
-      <label htmlFor={id} className={styles.label}>
+    <div className={styles.textarea}>
+      <label className={styles.label} htmlFor="description">
         {label}
       </label>
-      <input
+      <textarea
         id={id}
         className={styles.input}
-        required={required}
         onChange={({ target }) => onChange(target.value)}
         onBlur={onBlur}
         value={value}
-        type={type}
+        required={required}
       />
-      <p className={styles.error}>{ error && error}</p>
+      <p className={styles.error}>{error && error}</p>
     </div>
   );
 };
 
-export default TextField;
+export default TextArea;

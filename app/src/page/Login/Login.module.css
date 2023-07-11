@@ -9,9 +9,15 @@
   gap: 15px;
 }
 
+.formError {
+  padding-left: 9px;
+  color: red;
+  font-size: 14px;
+}
+
 @media only screen and (min-width: 750px) {
   .container {
-    max-width: 750px;
+    max-width: 734px;
     margin: 0 auto;
   }
 }

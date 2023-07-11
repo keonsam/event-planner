@@ -6,6 +6,7 @@ import styles from "./Login.module.css";
 import TextField from "../../components/TextField/TextField";
 import Button from "../../components/Button/Button";
 import { loginSchema } from "../../types/schema";
+import { AxiosError } from "axios";
 
 type FieldName = "username" | "password";
 
@@ -13,6 +14,12 @@ type LoginData = {
   username: string;
   password: string;
 };
+
+type LoginError = Partial<
+  LoginData & {
+    formError: string;
+  }
+>;
 
 const Login = () => {
   const navigate = useNavigate();
@@ -22,10 +29,21 @@ const Login = () => {
     password: "",
   });
 
+  const [error, setError] = useState<LoginError>({});
+
   const handleChange = (fieldName: FieldName, value: string) => {
+    const message =
+      loginSchema[fieldName].validate(login[fieldName]).error?.details[0]
+        .message || "";
+
     setLogin({
       ...login,
       [fieldName]: value,
+    });
+
+    setError({
+      ...error,
+      [fieldName]: message,
     });
   };
 
@@ -39,13 +57,18 @@ const Login = () => {
       );
       saveToken(data.token);
       navigate("/events");
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      if (err instanceof AxiosError) {
+        setError({
+          ...error,
+          formError: err.message,
+        });
+      }
     }
   };
 
-  // TODO: Change to onBlur
-  const { error } = loginSchema.validate(login);
+  const isValid =
+    !!login.username && !!login.password && !error.username && !error.password;
 
   return (
     <form className={styles.container} onSubmit={handleSubmit}>
@@ -54,6 +77,7 @@ const Login = () => {
         id="username"
         value={login.username}
         onChange={(value) => handleChange("username", value)}
+        error={error.username}
       />
 
       <TextField
@@ -62,10 +86,13 @@ const Login = () => {
         value={login.password}
         onChange={(value) => handleChange("password", value)}
         type="password"
+        error={error.password}
       />
 
+      <p className={styles.formError}>{error.formError && error.formError}</p>
+
       <div className={styles.buttonContainer}>
-        <Button label="Sign in" type="submit" primary disabled={!!error} />
+        <Button label="Sign in" type="submit" primary disabled={!isValid} />
         <Button
           label="Create new Account"
           onClick={() => navigate("/register")}

@@ -1,11 +1,12 @@
 import { FormEvent, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axiosClient from "../../config/axiosClient";
 import { User } from "../../types/User";
 import TextField from "../../components/TextField/TextField";
 import Button from "../../components/Button/Button";
 import styles from "./Register.module.css";
 import { registerSchema } from "../../types/schema";
+import { AxiosError } from "axios";
 
 type FieldName = "firstName" | "lastName" | "username" | "password";
 
@@ -16,6 +17,12 @@ type RegisterData = {
   password: string;
 };
 
+type RegisterError = Partial<
+  RegisterData & {
+    formError: string;
+  }
+>;
+
 const Register = () => {
   const navigate = useNavigate();
   const [register, setRegister] = useState<RegisterData>({
@@ -25,10 +32,21 @@ const Register = () => {
     password: "",
   });
 
+  const [error, setError] = useState<RegisterError>({});
+
   const handleChange = (fieldName: FieldName, value: string) => {
+    const message =
+      registerSchema[fieldName].validate(register[fieldName]).error?.details[0]
+        .message || "";
+
     setRegister({
       ...register,
       [fieldName]: value,
+    });
+
+    setError({
+      ...error,
+      [fieldName]: message,
     });
   };
 
@@ -38,35 +56,52 @@ const Register = () => {
     try {
       await axiosClient.post<User>("/register", register);
       navigate("/login");
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      if (err instanceof AxiosError) {
+        setError({
+          ...error,
+          formError: err.message,
+        });
+      }
     }
   };
 
-  // TODO: Change to onBlur
-  const { error } = registerSchema.validate(register);
+  const isValid =
+    !!register.firstName &&
+    !!register.lastName &&
+    !!register.username &&
+    !!register.password &&
+    !error.firstName &&
+    !error.lastName &&
+    !error.username &&
+    !error.password;
 
   return (
-    <form className={styles.container} onSubmit={handleSubmit}>
-      <TextField
-        label="First Name"
-        id="firstName"
-        value={register.firstName}
-        onChange={(value) => handleChange("firstName", value)}
-      />
+    <form className={styles.register} onSubmit={handleSubmit}>
+      <div className={styles.nameField}>
+        <TextField
+          label="First Name"
+          id="firstName"
+          value={register.firstName}
+          onChange={(value) => handleChange("firstName", value)}
+          error={error.firstName}
+        />
 
-      <TextField
-        label="Last Name"
-        id="lastName"
-        value={register.lastName}
-        onChange={(value) => handleChange("lastName", value)}
-      />
+        <TextField
+          label="Last Name"
+          id="lastName"
+          value={register.lastName}
+          onChange={(value) => handleChange("lastName", value)}
+          error={error.lastName}
+        />
+      </div>
 
       <TextField
         label="Username"
         id="username"
         value={register.username}
         onChange={(value) => handleChange("username", value)}
+        error={error.username}
       />
 
       <TextField
@@ -75,10 +110,13 @@ const Register = () => {
         value={register.password}
         type="password"
         onChange={(value) => handleChange("password", value)}
+        error={error.password}
       />
 
+      <p className={styles.formError}>{error.formError && error.formError}</p>
+
       <div className={styles.buttonContainer}>
-        <Button label="Sign up" type="submit" primary disabled={!!error} />
+        <Button label="Sign up" type="submit" primary disabled={!isValid} />
         <Button
           label="Already have an Account"
           onClick={() => navigate("/login")}
